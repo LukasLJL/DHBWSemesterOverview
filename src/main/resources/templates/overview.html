@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title>Overview</title>
+</head>
+<body>
+<h1>DHBW Semester Overview</h1>
+<p th:text="'Semester-Start: ' + ${semester.getStartDate()}"></p>
+<p th:text="'Semester-Ende: ' + ${semester.getEndDate()}"></p>
+<table>
+    <tr>
+        <th>Lecture</th>
+        <th>Lessons</th>
+        <th>Spent-Lessons</th>
+        <th>EntireTime</th>
+        <th>SpentTime</th>
+        <th>RestTime</th>
+    </tr>
+    <tr th:each="mapEntry : ${semester.getLectures()}">
+        <td th:text="${mapEntry.key}">keyvalue</td>
+        <td th:each="item : ${mapEntry.value}" th:text="${item.getLessons}">keyvalue</td>
+        <td th:each="item : ${mapEntry.value}" th:text="${item.getSpentLessons}">keyvalue</td>
+        <td th:each="item : ${mapEntry.value}" th:text="${item.getEntireTime}">keyvalue</td>
+        <td th:each="item : ${mapEntry.value}" th:text="${item.getSpentTime}">keyvalue</td>
+        <td th:each="item : ${mapEntry.value}" th:text="${item.getRestTime}">keyvalue</td>
+    </tr>
+
+</table>
+
+</body>
+</html>
