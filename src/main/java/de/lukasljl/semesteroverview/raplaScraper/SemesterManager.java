@@ -31,11 +31,13 @@ public class SemesterManager {
             }
             if (emptyWeekCounter == 3) {
                 foundSemesterStartDate = true;
+                System.out.println(semesterStartDate.toString());
                 semesterStartDate = semesterStartDate.plusWeeks(3);
+            } else if (!lectureDays.isEmpty() && emptyWeekCounter > 0) {
+                emptyWeekCounter = 0;
             } else {
                 semesterStartDate = semesterStartDate.minusWeeks(1);
             }
-
             semesterStartDate = setDayToMonday(semesterStartDate);
         }
         return semesterStartDate;
@@ -88,6 +90,8 @@ public class SemesterManager {
                     }
 
                     lectureOverview.setRestTime(Duration.ofMinutes(0));
+                    lectureOverview.setPercentFinish(lectureOverview.getSpentLessons() * 100 / lectureOverview.getLessons());
+                    lectureOverview.setPercentFinishHTMLAutomatically();
 
                     //add Object to map
                     allLectures.put(lecture.getTitle(), lectureOverview);
@@ -101,6 +105,8 @@ public class SemesterManager {
                         tempLectureOverview.setSpentLessons(tempLectureOverview.getSpentLessons() + 1);
                         tempLectureOverview.setSpentTime(tempLectureOverview.getSpentTime().plus(Duration.between(lecture.getStartTime(), lecture.getEndTime())));
                     }
+                    tempLectureOverview.setPercentFinish(tempLectureOverview.getSpentLessons() * 100 / tempLectureOverview.getLessons());
+                    tempLectureOverview.setPercentFinishHTMLAutomatically();
 
                     tempLectureOverview.setRestTime(tempLectureOverview.getEntireTime().minus(tempLectureOverview.getSpentTime()));
                     allLectures.replace(lecture.getTitle(), tempLectureOverview);

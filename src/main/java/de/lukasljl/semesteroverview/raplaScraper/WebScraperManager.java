@@ -24,7 +24,7 @@ public class WebScraperManager {
         System.out.println("Semester-Lectures: ");
         for (Map.Entry<String, LectureOverview> test : currentSemester.getLectures().entrySet()) {
             System.out.println(" Lecture: " + test.getValue().getTitle() + " // Counter-Lessons: " + test.getValue().getLessons() + " // EntireTime: " + test.getValue().getEntireTime().toString()
-                    + " // SpentTime: " + test.getValue().getSpentTime() + " // Spent-Lessons: " + test.getValue().getSpentLessons() + " // RestTime: " + test.getValue().getRestTime());
+                    + " // SpentTime: " + test.getValue().getSpentTime() + " // Spent-Lessons: " + test.getValue().getSpentLessons() + " // RestTime: " + test.getValue().getRestTime() + " // Finish: " + test.getValue().getPercentFinishHTML());
         }
     }
 

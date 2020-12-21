@@ -7,6 +7,8 @@ import java.time.LocalTime;
 public class LectureOverview extends Lecture {
     private int lessons;
     private int spentLessons;
+    private double percentFinish;
+    private String percentFinishHTML;
     private Duration entireTime;
     private Duration restTime;
     private Duration spentTime;
@@ -55,5 +57,22 @@ public class LectureOverview extends Lecture {
         this.restTime = restTime;
     }
 
+    public double getPercentFinish() {
+        return percentFinish;
+    }
 
+    public void setPercentFinish(int percentFinish) {
+        this.percentFinish = percentFinish;
+    }
+
+    public String getPercentFinishHTML() {
+        return percentFinishHTML;
+    }
+
+    public void setPercentFinishHTML(String percentFinishHTML) {
+        this.percentFinishHTML = percentFinishHTML;
+    }
+    public void setPercentFinishHTMLAutomatically(){
+        this.percentFinishHTML = percentFinish + "%";
+    }
 }
