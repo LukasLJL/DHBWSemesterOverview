@@ -137,17 +137,21 @@ public class SemesterManager {
             } else {
                 lectureOverview.setSpentTime(lectureOverview.getSpentTime().plus(Duration.between(lecture.getStartTime(), lecture.getEndTime())));
             }
-        } else {
-            lectureOverview.setSpentTime(Duration.ofMinutes(0));
         }
 
         lectureOverview.setPercentFinish(lectureOverview.getSpentLessons() * 100 / lectureOverview.getLessons());
         lectureOverview.setPercentFinishHTMLAutomatically();
 
-        lectureOverview.setRestTime(lectureOverview.getEntireTime().minus(lectureOverview.getSpentTime()));
+        if(lectureOverview.getSpentTime() == null){
+            lectureOverview.setRestTime(lectureOverview.getEntireTime());
+            lectureOverview.setSpentTimeHTML("0S");
+        } else {
+            lectureOverview.setRestTime(lectureOverview.getEntireTime().minus(lectureOverview.getSpentTime()));
+            lectureOverview.setSpentTimeHTML(lectureOverview.getSpentTime().toString().replace("PT", ""));
+        }
 
         //For HTML stuff remove the PT from the duration
         lectureOverview.setEntireTimeHTML(lectureOverview.getEntireTime().toString().replace("PT", ""));
-        lectureOverview.setSpentTimeHTML(lectureOverview.getSpentTime().toString().replace("PT", ""));
+
     }
 }
