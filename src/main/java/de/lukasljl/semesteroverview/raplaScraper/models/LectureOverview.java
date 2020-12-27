@@ -8,10 +8,13 @@ public class LectureOverview extends Lecture {
     private int lessons;
     private int spentLessons;
     private double percentFinish;
-    private String percentFinishHTML;
     private Duration entireTime;
     private Duration restTime;
     private Duration spentTime;
+    //for html stuff
+    private String entireTimeHTML;
+    private String spentTimeHTML;
+    private String percentFinishHTML;
 
     public LectureOverview(String title, String lecturer, LocalTime startTime, LocalTime endTime, LocalDate date) {
         super(title, lecturer, startTime, endTime, date);
@@ -69,10 +72,23 @@ public class LectureOverview extends Lecture {
         return percentFinishHTML;
     }
 
-    public void setPercentFinishHTML(String percentFinishHTML) {
-        this.percentFinishHTML = percentFinishHTML;
-    }
     public void setPercentFinishHTMLAutomatically(){
         this.percentFinishHTML = percentFinish + "%";
+    }
+
+    public String getEntireTimeHTML() {
+        return entireTimeHTML;
+    }
+
+    public void setEntireTimeHTML(String entireTimeHTML) {
+        this.entireTimeHTML = entireTimeHTML;
+    }
+
+    public String getSpentTimeHTML() {
+        return spentTimeHTML;
+    }
+
+    public void setSpentTimeHTML(String spentTimeHTML) {
+        this.spentTimeHTML = spentTimeHTML;
     }
 }

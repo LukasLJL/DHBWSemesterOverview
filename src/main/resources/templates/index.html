@@ -1,10 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- fontawesome icons-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+          integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <title>DHBW Semester Overview</title>
 </head>
 <body>
-<h1>HELLO</h1>
+
+<br>
+
+<div class="container">
+    <div class="shadow p-3 mb-5 bg-white rounded">
+        <h1 class="text-center">DHBW Semester Overview</h1>
+    </div>
+
+    <div class="shadow p-3 mb-5 bg-white rounded">
+        <h2 class="text-center">Enter your RaplaKey</h2>
+        <form class="mb-3" th:action="@{/dhbw/overview}" method="post">
+            <div class="col-auto">
+                <input type="text" class="form-control" th:value="${raplaKey}" name="raplaKey"
+                       placeholder="txB1FOi5xd1wUJBWuX8lJrog1ZNPBrE7IVuW7j2dZDr_O1hXpmPLKouUqFJE_-Xc">
+            </div>
+            <br>
+            <div class="d-grid col-1 mx-auto">
+                <button type="submit" class="btn btn-success"><i class="far fa-check-circle"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 </body>
 </html>

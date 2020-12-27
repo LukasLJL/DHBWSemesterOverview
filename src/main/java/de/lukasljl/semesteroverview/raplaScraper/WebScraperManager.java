@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class WebScraperManager {
 
-    public void getSemesterInformationExample(String raplaKey) {
+    public void getSemesterInformationConsole(String raplaKey) {
         SemesterManager semesterManager = new SemesterManager();
         LocalDate semesterStart = semesterManager.getSemesterStartDate(raplaKey);
         LocalDate semesterEnd = semesterManager.getSemesterEndDate(raplaKey);
@@ -33,11 +33,6 @@ public class WebScraperManager {
         LocalDate semesterStart = semesterManager.getSemesterStartDate(raplaKey);
         LocalDate semesterEnd = semesterManager.getSemesterEndDate(raplaKey);
 
-        Semester currentSemester = new Semester(
-                semesterStart,
-                semesterEnd,
-                semesterManager.getLecturesFromRapla(raplaKey, semesterStart, semesterEnd)
-        );
-        return currentSemester;
+        return new Semester(semesterStart, semesterEnd, semesterManager.getLecturesFromRapla(raplaKey, semesterStart, semesterEnd));
     }
 }

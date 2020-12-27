@@ -16,7 +16,6 @@ public class SemesterManager {
 
     }
 
-
     public LocalDate getSemesterStartDate(String raplaKey) {
         boolean foundSemesterStartDate = false;
         int emptyWeekCounter = 0;
@@ -78,40 +77,15 @@ public class SemesterManager {
                 if (!allLectures.containsKey(lecture.getTitle())) {
                     LectureOverview lectureOverview = new LectureOverview(lecture.getTitle(), lecture.getLecturer(), lecture.getStartTime(), lecture.getEndTime(), lecture.getDate());
                     //Set special information
-                    lectureOverview.setLessons(lectureOverview.getLessons() + 1);
-                    lectureOverview.setEntireTime(Duration.between(lecture.getStartTime(), lecture.getEndTime()));
-
-                    //Spend time & lessons
-                    if (semesterStart.isBefore(LocalDate.now())) {
-                        lectureOverview.setSpentTime(Duration.between(lecture.getStartTime(), lecture.getEndTime()));
-                        lectureOverview.setSpentLessons(1);
-                    } else {
-                        lectureOverview.setSpentTime(Duration.ofMinutes(0));
-                    }
-
-                    lectureOverview.setRestTime(Duration.ofMinutes(0));
-                    lectureOverview.setPercentFinish(lectureOverview.getSpentLessons() * 100 / lectureOverview.getLessons());
-                    lectureOverview.setPercentFinishHTMLAutomatically();
-
+                    setSpecialInformation(lectureOverview, lecture, semesterStart);
                     //add Object to map
                     allLectures.put(lecture.getTitle(), lectureOverview);
                 } else {
                     //Update properties of existing lecture
                     LectureOverview tempLectureOverview = allLectures.get(lecture.getTitle());
-                    tempLectureOverview.setLessons(tempLectureOverview.getLessons() + 1);
-                    tempLectureOverview.setEntireTime(tempLectureOverview.getEntireTime().plus(Duration.between(lecture.getStartTime(), lecture.getEndTime())));
-
-                    if (semesterStart.isBefore(LocalDate.now())) {
-                        tempLectureOverview.setSpentLessons(tempLectureOverview.getSpentLessons() + 1);
-                        tempLectureOverview.setSpentTime(tempLectureOverview.getSpentTime().plus(Duration.between(lecture.getStartTime(), lecture.getEndTime())));
-                    }
-                    tempLectureOverview.setPercentFinish(tempLectureOverview.getSpentLessons() * 100 / tempLectureOverview.getLessons());
-                    tempLectureOverview.setPercentFinishHTMLAutomatically();
-
-                    tempLectureOverview.setRestTime(tempLectureOverview.getEntireTime().minus(tempLectureOverview.getSpentTime()));
+                    setSpecialInformation(tempLectureOverview, lecture, semesterStart);
                     allLectures.replace(lecture.getTitle(), tempLectureOverview);
                 }
-
             }
             semesterStart = semesterStart.plusWeeks(1);
         }
@@ -143,4 +117,37 @@ public class SemesterManager {
         return date;
     }
 
+    private void setSpecialInformation(LectureOverview lectureOverview, Lecture lecture, LocalDate semesterStart) {
+        lectureOverview.setLessons(lectureOverview.getLessons() + 1);
+
+        //EntireTime is null on the first run
+        if (lectureOverview.getEntireTime() == null) {
+            lectureOverview.setEntireTime(Duration.between(lecture.getStartTime(), lecture.getEndTime()));
+        } else {
+            lectureOverview.setEntireTime(lectureOverview.getEntireTime().plus(Duration.between(lecture.getStartTime(), lecture.getEndTime())));
+        }
+
+        //Spent time & lessons
+        if (semesterStart.isBefore(LocalDate.now())) {
+
+            lectureOverview.setSpentLessons(lectureOverview.getSpentLessons() + 1);
+            //SpentTime is null on the first run
+            if (lectureOverview.getSpentTime() == null) {
+                lectureOverview.setSpentTime(Duration.between(lecture.getStartTime(), lecture.getEndTime()));
+            } else {
+                lectureOverview.setSpentTime(lectureOverview.getSpentTime().plus(Duration.between(lecture.getStartTime(), lecture.getEndTime())));
+            }
+        } else {
+            lectureOverview.setSpentTime(Duration.ofMinutes(0));
+        }
+
+        lectureOverview.setPercentFinish(lectureOverview.getSpentLessons() * 100 / lectureOverview.getLessons());
+        lectureOverview.setPercentFinishHTMLAutomatically();
+
+        lectureOverview.setRestTime(lectureOverview.getEntireTime().minus(lectureOverview.getSpentTime()));
+
+        //For HTML stuff remove the PT from the duration
+        lectureOverview.setEntireTimeHTML(lectureOverview.getEntireTime().toString().replace("PT", ""));
+        lectureOverview.setSpentTimeHTML(lectureOverview.getSpentTime().toString().replace("PT", ""));
+    }
 }

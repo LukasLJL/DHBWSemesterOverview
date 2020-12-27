@@ -2,61 +2,64 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width">
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- fontawesome icons-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+          integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <title>Overview</title>
 </head>
 <body>
-<h1>DHBW Semester Overview</h1>
-<p th:text="'Semester-Start: ' + ${semester.getStartDate()}"></p>
-<p th:text="'Semester-Ende: ' + ${semester.getEndDate()}"></p>
 
+<br>
 
-<div th:each="mapEntry : ${semester.getLectures()}">
-    <h2 th:text="${mapEntry.key}">keyvalue</h2>
-    <div th:each="item : ${mapEntry.value}" >
-        <div class="progress" >
-            <div class="progress-bar" role="progressbar" th:style="'width: ' + ${item.getPercentFinishHTML}" aria-valuenow=th:text="${item.getSpentLessons}" aria-valuemin="0"
-                 aria-valuemax=th:text="${item.getLessons}"> <a th:text="${item.getSpentLessons}">keyvalue</a>
+<div class="container">
+    <div class="shadow p-3 mb-5 bg-white rounded">
+        <h1 class="text-center">DHBW Semester Overview</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <p class="text-center" th:text="'Semester-Start: ' + ${semester.getStartDate()}"></p>
+                </div>
+                <div class="col-sm">
+                    <p class="text-center" th:text="'Semester-End: ' + ${semester.getEndDate()}"></p>
+                </div>
             </div>
-            <p th:text="${item.getLessons}">keyvalue</p>
         </div>
-        <table>
-            <tr>
-                <th>Entire-Time</th>
-                <th>Spent-Time</th>
-                <th>Rest-Time</th>
-            </tr>
-            <tr>
-                <td th:text="${item.getEntireTime}">keyvalue</td>
-                <td th:text="${item.getSpentTime}">keyvalue</td>
-                <td th:text="${item.getRestTime}">keyvalue</td>
-            </tr>
-        </table>
     </div>
 </div>
 
-<table>
-    <tr>
-        <th>Lecture</th>
-        <th>Lessons</th>
-        <th>Spent-Lessons</th>
-        <th>EntireTime</th>
-        <th>SpentTime</th>
-        <th>RestTime</th>
-        <th>% Finish</th>
-    </tr>
-    <tr th:each="mapEntry : ${semester.getLectures()}">
-        <td th:text="${mapEntry.key}">keyvalue</td>
-        <td th:each="item : ${mapEntry.value}" th:text="${item.getLessons}">keyvalue</td>
-        <td th:each="item : ${mapEntry.value}" th:text="${item.getSpentLessons}">keyvalue</td>
-        <td th:each="item : ${mapEntry.value}" th:text="${item.getEntireTime}">keyvalue</td>
-        <td th:each="item : ${mapEntry.value}" th:text="${item.getSpentTime}">keyvalue</td>
-        <td th:each="item : ${mapEntry.value}" th:text="${item.getRestTime}">keyvalue</td>
-        <td th:each="item : ${mapEntry.value}" th:text="${item.getPercentFinish}">keyvalue</td>
-    </tr>
-
-</table>
+<div class="container" th:each="mapEntry : ${semester.getLectures()}">
+    <div class="shadow p-3 mb-5 bg-white rounded">
+        <h2 th:text="${mapEntry.key}">keyvalue</h2>
+        <div th:each="item : ${mapEntry.value}">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" th:style="'width: ' + ${item.getPercentFinishHTML}"><span
+                        th:text="${item.getPercentFinishHTML}">keyvalue</span></div>
+            </div>
+            <br>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                        <p class="text-center">Lessons:
+                            <span th:text="${item.getSpentLessons}">keyvalue</span>
+                            /
+                            <span th:text="${item.getLessons}">keyvalue</span>
+                        </p>
+                    </div>
+                    <div class="col-sm">
+                        <p class="text-center">Time:
+                            <span th:text="${item.getSpentTimeHTML}">keyvalue</span>
+                            /
+                            <span th:text="${item.getEntireTimeHTML}">keyvalue</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
