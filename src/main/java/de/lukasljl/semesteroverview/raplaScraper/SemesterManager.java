@@ -19,7 +19,9 @@ public class SemesterManager {
     public LocalDate getSemesterStartDate(String raplaKey) {
         boolean foundSemesterStartDate = false;
         boolean backwards = true;
+        boolean semesterIsRunning = false;
         int emptyWeekCounter = 0;
+        int klausur = 0;
 
         //getSemester startDate from Rapla
         LocalDate semesterStartDate = LocalDate.now();
@@ -27,31 +29,45 @@ public class SemesterManager {
         while (!foundSemesterStartDate) {
             Scraper scraper = new Scraper(UrlBuilder.getUrl(raplaKey, semesterStartDate));
             ArrayList<Lecture> lectureDays = scraper.getLectureDaysFromPage();
+            System.out.println(semesterStartDate);
+            System.out.println(emptyWeekCounter);
+            //Counter for Empty Weeeks
             if (lectureDays.isEmpty()) {
                 emptyWeekCounter++;
             }
-            if (emptyWeekCounter == 3 && lectureDays.isEmpty() && backwards){
+            //Check if there is a Klausur before the actual semester start and check if the semester started already
+            if (!lectureDays.isEmpty()) {
+                if (lectureDays.get(0).isKlausur()) {
+                    klausur++;
+                }
+                semesterIsRunning = true;
+            }
+            //Reached emptyWeekCounter limit, switch to forward mode if there was nothing found in the past
+            if (emptyWeekCounter == 3 && lectureDays.isEmpty() && backwards && !semesterIsRunning) {
                 emptyWeekCounter = 0;
                 semesterStartDate = LocalDate.now();
                 semesterStartDate = setDayToMonday(semesterStartDate);
                 backwards = false;
             }
+            //Reached weekCounter limit. Now we found the actual semester start with the backward mode (happens when semester is already started)
             if (emptyWeekCounter == 3) {
                 foundSemesterStartDate = true;
-                System.out.println(semesterStartDate.toString());
-                if (backwards){
-                    semesterStartDate = semesterStartDate.plusWeeks(3);
-                } else if(!backwards){
-                    semesterStartDate = semesterStartDate.minusWeeks(3);
+                if (backwards) {
+                    semesterStartDate = semesterStartDate.plusWeeks(3+klausur);
                 }
             } else if (!lectureDays.isEmpty() && emptyWeekCounter > 0) {
                 emptyWeekCounter = 0;
+            //Backward mode search for 3 empty week in a row
             } else if (backwards) {
                 semesterStartDate = semesterStartDate.minusWeeks(1);
-            } else if (!backwards && lectureDays.isEmpty()) {
-                semesterStartDate = semesterStartDate.plusWeeks(1);
-            } else if (!backwards && !lectureDays.isEmpty()){
-                foundSemesterStartDate = true;
+            //Forward mode search for empty week in the future
+            } else if (!backwards) {
+                if (lectureDays.isEmpty()){
+                    semesterStartDate = semesterStartDate.plusWeeks(1);
+                } else {
+                    semesterStartDate = semesterStartDate.minusWeeks(emptyWeekCounter-klausur);
+                    foundSemesterStartDate = true;
+                }
             }
             semesterStartDate = setDayToMonday(semesterStartDate);
         }
@@ -66,7 +82,6 @@ public class SemesterManager {
         while (!foundSemesterEndDate) {
             Scraper scraper = new Scraper(UrlBuilder.getUrl(raplaKey, semesterEndDate));
             ArrayList<Lecture> lectureDays = scraper.getLectureDaysFromPage();
-            System.out.println(semesterEndDate);
             if (!lectureDays.isEmpty()) {
                 if (lectureDays.get(1).isKlausur()) {
                     foundSemesterEndDate = true;
