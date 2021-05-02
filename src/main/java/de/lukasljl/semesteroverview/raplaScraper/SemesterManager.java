@@ -18,40 +18,55 @@ public class SemesterManager {
 
     public LocalDate getSemesterStartDate(String raplaKey) {
         boolean foundSemesterStartDate = false;
+        boolean backwards = true;
         int emptyWeekCounter = 0;
 
         //getSemester startDate from Rapla
         LocalDate semesterStartDate = LocalDate.now();
+        semesterStartDate = setDayToMonday(semesterStartDate);
         while (!foundSemesterStartDate) {
             Scraper scraper = new Scraper(UrlBuilder.getUrl(raplaKey, semesterStartDate));
             ArrayList<Lecture> lectureDays = scraper.getLectureDaysFromPage();
             if (lectureDays.isEmpty()) {
                 emptyWeekCounter++;
             }
+            if (emptyWeekCounter == 3 && lectureDays.isEmpty() && backwards){
+                emptyWeekCounter = 0;
+                semesterStartDate = LocalDate.now();
+                semesterStartDate = setDayToMonday(semesterStartDate);
+                backwards = false;
+            }
             if (emptyWeekCounter == 3) {
                 foundSemesterStartDate = true;
                 System.out.println(semesterStartDate.toString());
-                semesterStartDate = semesterStartDate.plusWeeks(3);
+                if (backwards){
+                    semesterStartDate = semesterStartDate.plusWeeks(3);
+                } else if(!backwards){
+                    semesterStartDate = semesterStartDate.minusWeeks(3);
+                }
             } else if (!lectureDays.isEmpty() && emptyWeekCounter > 0) {
                 emptyWeekCounter = 0;
-            } else {
+            } else if (backwards) {
                 semesterStartDate = semesterStartDate.minusWeeks(1);
+            } else if (!backwards && lectureDays.isEmpty()) {
+                semesterStartDate = semesterStartDate.plusWeeks(1);
+            } else if (!backwards && !lectureDays.isEmpty()){
+                foundSemesterStartDate = true;
             }
             semesterStartDate = setDayToMonday(semesterStartDate);
         }
         return semesterStartDate;
     }
 
-    public LocalDate getSemesterEndDate(String raplaKey) {
+    public LocalDate getSemesterEndDate(String raplaKey, LocalDate semesterStartDate) {
         boolean foundSemesterEndDate = false;
         //getSemesterEndDate
-        LocalDate semesterEndDate = LocalDate.now();
-        semesterEndDate = setDayToMonday(semesterEndDate);
+        LocalDate semesterEndDate = semesterStartDate;
 
         while (!foundSemesterEndDate) {
             Scraper scraper = new Scraper(UrlBuilder.getUrl(raplaKey, semesterEndDate));
             ArrayList<Lecture> lectureDays = scraper.getLectureDaysFromPage();
-
+            System.out.println(semesterEndDate);
             if (!lectureDays.isEmpty()) {
                 if (lectureDays.get(1).isKlausur()) {
                     foundSemesterEndDate = true;
@@ -74,17 +89,19 @@ public class SemesterManager {
             ArrayList<Lecture> lectureDays = scraper.getLectureDaysFromPage();
 
             for (Lecture lecture : lectureDays) {
-                if (!allLectures.containsKey(lecture.getTitle())) {
-                    LectureOverview lectureOverview = new LectureOverview(lecture.getTitle(), lecture.getLecturer(), lecture.getStartTime(), lecture.getEndTime(), lecture.getDate());
-                    //Set special information
-                    setSpecialInformation(lectureOverview, lecture, semesterStart);
-                    //add Object to map
-                    allLectures.put(lecture.getTitle(), lectureOverview);
-                } else {
-                    //Update properties of existing lecture
-                    LectureOverview tempLectureOverview = allLectures.get(lecture.getTitle());
-                    setSpecialInformation(tempLectureOverview, lecture, semesterStart);
-                    allLectures.replace(lecture.getTitle(), tempLectureOverview);
+                if (!lecture.isHoliday()) {
+                    if (!allLectures.containsKey(lecture.getTitle())) {
+                        LectureOverview lectureOverview = new LectureOverview(lecture.getTitle(), lecture.getLecturer(), lecture.getStartTime(), lecture.getEndTime(), lecture.getDate());
+                        //Set special information
+                        setSpecialInformation(lectureOverview, lecture, semesterStart);
+                        //add Object to map
+                        allLectures.put(lecture.getTitle(), lectureOverview);
+                    } else {
+                        //Update properties of existing lecture
+                        LectureOverview tempLectureOverview = allLectures.get(lecture.getTitle());
+                        setSpecialInformation(tempLectureOverview, lecture, semesterStart);
+                        allLectures.replace(lecture.getTitle(), tempLectureOverview);
+                    }
                 }
             }
             semesterStart = semesterStart.plusWeeks(1);
@@ -142,7 +159,7 @@ public class SemesterManager {
         lectureOverview.setPercentFinish(lectureOverview.getSpentLessons() * 100 / lectureOverview.getLessons());
         lectureOverview.setPercentFinishHTMLAutomatically();
 
-        if(lectureOverview.getSpentTime() == null){
+        if (lectureOverview.getSpentTime() == null) {
             lectureOverview.setRestTime(lectureOverview.getEntireTime());
             lectureOverview.setSpentTimeHTML("0S");
         } else {

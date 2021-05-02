@@ -11,7 +11,7 @@ public class WebScraperManager {
     public void getSemesterInformationConsole(String raplaKey) {
         SemesterManager semesterManager = new SemesterManager();
         LocalDate semesterStart = semesterManager.getSemesterStartDate(raplaKey);
-        LocalDate semesterEnd = semesterManager.getSemesterEndDate(raplaKey);
+        LocalDate semesterEnd = semesterManager.getSemesterEndDate(raplaKey, semesterStart);
 
         Semester currentSemester = new Semester(
                 semesterStart,
@@ -31,7 +31,7 @@ public class WebScraperManager {
     public Semester getSemesterInformation(String raplaKey) {
         SemesterManager semesterManager = new SemesterManager();
         LocalDate semesterStart = semesterManager.getSemesterStartDate(raplaKey);
-        LocalDate semesterEnd = semesterManager.getSemesterEndDate(raplaKey);
+        LocalDate semesterEnd = semesterManager.getSemesterEndDate(raplaKey, semesterStart);
 
         return new Semester(semesterStart, semesterEnd, semesterManager.getLecturesFromRapla(raplaKey, semesterStart, semesterEnd));
     }

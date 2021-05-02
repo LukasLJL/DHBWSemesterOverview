@@ -30,19 +30,24 @@ public class Scraper {
         }
     }
 
-    public ArrayList<Lecture> getLectureDaysFromPage(){
+    public ArrayList<Lecture> getLectureDaysFromPage() {
         ArrayList<Element> lecturesAsHtmlElements = getAllLecturesAsHtmlElements();
         ArrayList<Lecture> lectures = new ArrayList<>();
 
-        for (Element element : lecturesAsHtmlElements){
+        for (Element element : lecturesAsHtmlElements) {
             boolean isKlausur = false;
+            boolean isHoliday = false;
             LocalDate dateOfLecture;
             LocalTime[] times = getTimesForLectureElement(element);
-            if (element.attributes().get("style").equals("background-color:#F79F81")){
+            if (element.attributes().get("style").equals("background-color:#F79F81")) {
                 dateOfLecture = firstDateOfWeek.plusDays(Long.parseLong(element.select("a[href]").attr("href").substring(1)));
                 isKlausur = true;
-            }
-            else {
+
+            } else if (element.attributes().get("style").equals("background-color:#ffd700") || element.attributes().get("style").equals("background-color:#ff0000")) {
+                dateOfLecture = firstDateOfWeek.plusDays(Long.parseLong(element.select("a[href]").attr("href").substring(1)));
+                isHoliday = true;
+
+            } else {
                 dateOfLecture = firstDateOfWeek.plusDays(numberOfDaysFromMonday(getDayOfWeekFromLectureElement(element)));
             }
             Lecture lecture = new Lecture(
@@ -51,7 +56,8 @@ public class Scraper {
                     times[0],
                     times[1],
                     dateOfLecture,
-                    isKlausur
+                    isKlausur,
+                    isHoliday
             );
             lectures.add(lecture);
         }
@@ -59,8 +65,8 @@ public class Scraper {
         return lectures;
     }
 
-    private int numberOfDaysFromMonday(String day){
-        switch (day){
+    private int numberOfDaysFromMonday(String day) {
+        switch (day) {
             case "Mo":
                 return 0;
             case "Di":
@@ -80,13 +86,13 @@ public class Scraper {
         }
     }
 
-    private LocalDate getDate(Element element){
+    private LocalDate getDate(Element element) {
         int day = Integer.parseInt(element.select("select[name=day]").select("option[selected]").text());
         String monthName = element.select("select[name=month]").select("option[selected]").text();
         int year = Integer.parseInt(element.select("select[name=year]").select("option[selected]").text());
         int month;
 
-        switch (monthName){
+        switch (monthName) {
             case "Januar":
                 month = 1;
                 break;
@@ -130,20 +136,20 @@ public class Scraper {
         LocalDate foundDate = LocalDate.of(year, month, day);
 
         // always returns the monday of that week, as it is needed for correct date assessment
-        while (!(foundDate.getDayOfWeek() == DayOfWeek.MONDAY)){
+        while (!(foundDate.getDayOfWeek() == DayOfWeek.MONDAY)) {
             foundDate = foundDate.minusDays(1);
         }
 
         return foundDate;
     }
 
-    private String getTitleFromElement(Element element){
+    private String getTitleFromElement(Element element) {
         return element.select("a[href^=#]").text().split(" erstellt am")[0].substring(13);
 
     }
 
 
-    private String getLecturerFromElement(Element element){
+    private String getLecturerFromElement(Element element) {
         String lecturer = element.select("span.person").text();
         if (lecturer.equals(""))
             return lecturer;
@@ -151,11 +157,11 @@ public class Scraper {
         return lecturer;
     }
 
-    private String getDayOfWeekFromLectureElement(Element element){
+    private String getDayOfWeekFromLectureElement(Element element) {
         return element.select("div").get(1).text().substring(0, 2);
     }
 
-    private LocalTime[] getTimesForLectureElement(Element element){
+    private LocalTime[] getTimesForLectureElement(Element element) {
         String timeText = element.select("a[href^=#]").text();
         String startTimeText = timeText.substring(0, 5);
         String endTimeText = timeText.substring(7, 12);
@@ -165,7 +171,7 @@ public class Scraper {
                         Integer.parseInt(endTimeText.substring(3, 5)))};
     }
 
-    private ArrayList<Element> getAllLecturesAsHtmlElements(){
+    private ArrayList<Element> getAllLecturesAsHtmlElements() {
         return document.select("td[class=week_block]");
     }
 
