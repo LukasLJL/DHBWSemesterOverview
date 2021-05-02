@@ -29,8 +29,6 @@ public class SemesterManager {
         while (!foundSemesterStartDate) {
             Scraper scraper = new Scraper(UrlBuilder.getUrl(raplaKey, semesterStartDate));
             ArrayList<Lecture> lectureDays = scraper.getLectureDaysFromPage();
-            System.out.println(semesterStartDate);
-            System.out.println(emptyWeekCounter);
             //Counter for Empty Weeeks
             if (lectureDays.isEmpty()) {
                 emptyWeekCounter++;
