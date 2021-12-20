@@ -18,7 +18,7 @@ public class MainController {
     @RequestMapping("/overview")
     public String dhbwOverviewPage(@RequestParam (required = false) String raplaKey, Model model) {
         if (raplaKey == null || raplaKey.equals("")) {
-            return "index.html";
+            return "index";
         } else {
             WebScraperManager webScraperManager = new WebScraperManager();
 
