@@ -1,4 +1,9 @@
-FROM openjdk:8-alpine
-COPY ./target/semesteroverview-1.0.0.jar /opt/dhbw-overview/semesteroverview-1.0.0.jar
+FROM maven:3.8-openjdk-17 AS builder
+COPY . /src
+WORKDIR /src
+RUN mvn clean package
 
-ENTRYPOINT ["java", "-jar", "/opt/dhbw-overview/semesteroverview-1.0.0.jar"]
+FROM openjdk:17-alpine
+COPY --from=builder /src/target/semesteroverview-*.jar ./opt/semesteroverview.jar
+
+ENTRYPOINT ["java", "-jar", "/opt/semesteroverview.jar"]
