@@ -3,7 +3,7 @@ COPY . /src
 WORKDIR /src
 RUN mvn clean package
 
-FROM openjdk:17
+FROM openjdk:17-alpine
 COPY --from=builder /src/target/semesteroverview-*.jar ./opt/semesteroverview.jar
 
 ENTRYPOINT ["java", "-jar", "/opt/semesteroverview.jar"]
